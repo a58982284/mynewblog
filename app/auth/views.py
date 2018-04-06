@@ -9,6 +9,13 @@ from .forms import LoginForm, RegistrationForm, ChangePasswordForm, \
     PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
 
 
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.ping()
+
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -30,3 +37,17 @@ def logout():
     logout_user()
     flash('你已经成功退出.')
     return redirect(url_for('main.index'))
+
+
+auth.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data,
+                    username=form.username.data,
+                    password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('你现在可以登录了.')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/register.html', form=form)
