@@ -31,6 +31,12 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
+    def gravatar(self, size=100, default='identicon',rating='g'):
+        url = 'http://secure.gravatar.com/avatar'
+        hash = self.avatar_hash or self.gravatar_hash()
+        return '{url}/{hash}?={size}&d={default}&r={raring}'.format(
+            url=url, hash=hash, size=size, default=default, rating=rating)
+
 
 
 
